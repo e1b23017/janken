@@ -7,10 +7,15 @@
 </head>
 
 <body>
+  <a href="/logout">ログアウト</a>
+  <h2>じゃんけん！</h2>
+  <p>エントリー</p>
+  <ul>
+    <li th:each="user : ${allUsers}" th:text="${user}"></li>
+  </ul>
   <div th:if="${username != null}">
     <p>Hi <span th:text="${username}"></span></p>
   </div>
-  <h2>じゃんけん！</h2>
   <div>
     <a th:href="@{/janken(hand='グー')}">グー</a>
     <a th:href="@{/janken(hand='チョキ')}">チョキ</a>
