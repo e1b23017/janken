@@ -10,8 +10,14 @@
   <a href="/logout">ログアウト</a>
   <h1>Match</h1>
 
+  <div th:if="${error != null}">
+    <p th:text="${error}"></p>
+    <p><a th:href="@{/janken}">もどる</a></p>
+  </div>
+
   <div th:if="${loginUser == null}">
     <p>ログインユーザ情報が見つかりません。</p>
+    <p><a th:href="@{/janken}">もどる</a></p>
   </div>
 
   <div th:if="${opponent == null}">
@@ -26,10 +32,27 @@
       <span th:text="${opponent.name}">相手</span>
     </h2>
 
+    <!-- ここにじゃんけんの手リンクを置く（クリックで /fight に移動） -->
+    <p>手を選んでください：</p>
     <p>
-      <a th:href="@{/janken}">もどる</a>
+      <a th:href="@{/fight(id=${opponent.id}, hand='Gu')}">グー</a>
+      &nbsp;
+      <a th:href="@{/fight(id=${opponent.id}, hand='Choki')}">チョキ</a>
+      &nbsp;
+      <a th:href="@{/fight(id=${opponent.id}, hand='Pa')}">パー</a>
     </p>
+
+    <!-- 判定結果表示（/fight 実行後に model に詰められる） -->
+    <div th:if="${result != null}">
+      <p>あなたの手: <span th:text="${userHand}"></span></p>
+      <p>あいての手: <span th:text="${cpuHand}"></span></p>
+      <p>結果: <span th:text="${result}"></span></p>
+    </div>
+
+    <p><a href="/janken">もどる</a></p>
   </div>
+
+  <hr />
 </body>
 
 </html>

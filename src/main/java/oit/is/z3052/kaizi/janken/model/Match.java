@@ -1,14 +1,14 @@
 package oit.is.z3052.kaizi.janken.model;
 
 public class Match {
-  Integer id;
-  Integer user1; // user id
-  Integer user2; // user id
-  String user1Hand;
-  String user2Hand;
-  String created_at;
-  String user1Name;
-  String user2Name;
+  private Integer id;
+  private Integer user1;
+  private Integer user2;
+  private String user1Hand;
+  private String user2Hand;
+
+  private String user1Name;
+  private String user2Name;
 
   public Match() {
   }
@@ -51,14 +51,6 @@ public class Match {
 
   public void setUser2Hand(String user2Hand) {
     this.user2Hand = user2Hand;
-  }
-
-  public String getCreated_at() {
-    return created_at;
-  }
-
-  public void setCreated_at(String created_at) {
-    this.created_at = created_at;
   }
 
   public String getUser1Name() {

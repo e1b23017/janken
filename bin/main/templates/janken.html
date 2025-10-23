@@ -18,15 +18,6 @@
   <div th:if="${username != null}">
     <p>Hi <span th:text="${username}"></span></p>
   </div>
-  <div>
-    <a th:href="@{/janken(hand='グー')}">グー</a>
-    <a th:href="@{/janken(hand='チョキ')}">チョキ</a>
-    <a th:href="@{/janken(hand='パー')}">パー</a>
-  </div>
-  <div th:if="${result != null}">
-    <p>あなたの手: <span th:text="${userHand}"></span></p>
-    <p>あいての手: <span th:text="${cpuHand}"></span></p>
-    <p>結果: <span th:text="${result}"></span></p>
   </div>
   <h3>試合結果</h3>
   <div th:if="${allMatches == null or #lists.isEmpty(allMatches)}">

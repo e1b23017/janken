@@ -33,7 +33,6 @@ public class JankenController {
       Principal prin) {
 
     String username = prin.getName();
-    System.out.println("login username: " + username);
 
     // ログインユーザが users テーブルに存在しなければ追加する (初回のみ)
     User existing = userMapper.selectByName(username);
@@ -45,14 +44,12 @@ public class JankenController {
 
     // DB から全ユーザを取得してテンプレに渡す
     ArrayList<User> users = userMapper.selectAll();
-    System.out.println("users.size() = " + users.size());
 
     model.addAttribute("username", username);
     model.addAttribute("allUsers", users);
 
     // DB から全試合を取得してテンプレへ渡す (ArrayListを利用)
     ArrayList<Match> matches = matchMapper.selectAll();
-    System.out.println("matches.size() = " + matches.size());
     model.addAttribute("allMatches", matches);
 
     if (userHand != null) {
@@ -93,6 +90,59 @@ public class JankenController {
     // Model に入れる
     model.addAttribute("loginUser", loginUser);
     model.addAttribute("opponent", opponent);
+
+    return "match";
+  }
+
+  @GetMapping("/fight")
+  public String doFight(@RequestParam("id") Integer opponentId,
+      @RequestParam("hand") String userHand,
+      Model model,
+      Principal prin) {
+    String loginName = (prin != null) ? prin.getName() : null;
+    if (loginName == null) {
+      model.addAttribute("error", "ログイン情報が見つかりません。");
+      return "match";
+    }
+
+    // ログインユーザと対戦相手を取得
+    User loginUser = userMapper.selectByName(loginName);
+    User opponent = userMapper.selectById(opponentId);
+
+    if (loginUser == null) {
+      model.addAttribute("error", "ログインユーザが見つかりません。");
+      return "match";
+    }
+    if (opponent == null) {
+      model.addAttribute("error", "対戦相手が見つかりません。");
+      return "match";
+    }
+
+    Janken janken = new Janken();
+    String cpuHand = janken.getCpuHand();
+
+    // 判定
+    String result = janken.judge(userHand, cpuHand);
+
+    // DB に保存する
+    try {
+      Match newMatch = new Match();
+      newMatch.setUser2(opponent.getId());
+      newMatch.setUser1(loginUser.getId());
+      newMatch.setUser2Hand(userHand);
+      newMatch.setUser1Hand(cpuHand);
+      matchMapper.insertMatch(newMatch);
+    } catch (Exception e) {
+      System.err.println("failed to insert match: " + e.getMessage());
+      model.addAttribute("dbError", "試合情報の保存に失敗しました。");
+    }
+
+    // 表示用に model に詰める
+    model.addAttribute("loginUser", loginUser);
+    model.addAttribute("opponent", opponent);
+    model.addAttribute("userHand", userHand);
+    model.addAttribute("cpuHand", cpuHand);
+    model.addAttribute("result", result);
 
     return "match";
   }
