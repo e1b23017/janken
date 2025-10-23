@@ -11,21 +11,29 @@
   <h2>じゃんけん！</h2>
   <p>エントリー</p>
   <ul>
-    <li th:each="user : ${allUsers}" th:text="${user}"></li>
+    <li th:each="u : ${allUsers}">
+      <a th:href="@{/match(id=${u.id})}" th:text="${u.name}">ユーザ名</a>
+    </li>
   </ul>
   <div th:if="${username != null}">
     <p>Hi <span th:text="${username}"></span></p>
   </div>
-  <div>
-    <a th:href="@{/janken(hand='グー')}">グー</a>
-    <a th:href="@{/janken(hand='チョキ')}">チョキ</a>
-    <a th:href="@{/janken(hand='パー')}">パー</a>
   </div>
-  <div th:if="${result != null}">
-    <p>あなたの手: <span th:text="${userHand}"></span></p>
-    <p>あいての手: <span th:text="${cpuHand}"></span></p>
-    <p>結果: <span th:text="${result}"></span></p>
+  <h3>試合結果</h3>
+  <div th:if="${allMatches == null or #lists.isEmpty(allMatches)}">
+    <p>試合はまだありません。</p>
   </div>
+
+
+  <ul style="list-style:none; padding-left:0;">
+    <li th:each="m : ${allMatches}">
+      <span th:text="${'id:' + m.id
+                       + ' user1:' + (m.user1 != null ? m.user1 : '-')
+                       + ' user2:' + (m.user2 != null ? m.user2 : '-')
+                       + ' user1の手:' + (m.user1Hand != null ? m.user1Hand : '-')
+                       + ' user2の手:' + (m.user2Hand != null ? m.user2Hand : '-') }"></span>
+    </li>
+  </ul>
 </body>
 
 </html>
