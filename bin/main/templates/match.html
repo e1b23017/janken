@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Match</title>
+</head>
+
+<body>
+  <a href="/logout">ログアウト</a>
+  <h1>Match</h1>
+
+  <div th:if="${loginUser == null}">
+    <p>ログインユーザ情報が見つかりません。</p>
+  </div>
+
+  <div th:if="${opponent == null}">
+    <p>対戦相手が見つかりません (指定した id が存在しない可能性があります)。</p>
+    <p><a th:href="@{/janken}">もどる</a></p>
+  </div>
+
+  <div th:if="${loginUser != null && opponent != null}">
+    <h2>
+      <span th:text="${loginUser.name}">あなた</span>
+      &nbsp;V.S.&nbsp;
+      <span th:text="${opponent.name}">相手</span>
+    </h2>
+
+    <p>
+      <a th:href="@{/janken}">もどる</a>
+    </p>
+  </div>
+</body>
+
+</html>

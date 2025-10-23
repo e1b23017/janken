@@ -14,7 +14,6 @@ import oit.is.z3052.kaizi.janken.model.MatchMapper;
 import oit.is.z3052.kaizi.janken.model.User;
 import oit.is.z3052.kaizi.janken.model.UserMapper;
 import oit.is.z3052.kaizi.janken.model.Match;
-import oit.is.z3052.kaizi.janken.model.MatchMapper;
 
 @Controller
 public class JankenController {
@@ -67,6 +66,35 @@ public class JankenController {
     }
 
     return "janken";
+  }
+
+  @GetMapping("/match")
+  public String showMatch(@RequestParam("id") Integer id, Model model, Principal prin) {
+    String loginName = (prin != null) ? prin.getName() : null;
+
+    // ログインユーザの User オブジェクト
+    User loginUser = null;
+    if (loginName != null) {
+      try {
+        loginUser = userMapper.selectByName(loginName);
+      } catch (Exception e) {
+        System.err.println("failed to load login user: " + e.getMessage());
+      }
+    }
+
+    // 対戦相手ユーザを id から取得
+    User opponent = null;
+    try {
+      opponent = userMapper.selectById(id);
+    } catch (Exception e) {
+      System.err.println("failed to load opponent user id=" + id + " : " + e.getMessage());
+    }
+
+    // Model に入れる
+    model.addAttribute("loginUser", loginUser);
+    model.addAttribute("opponent", opponent);
+
+    return "match";
   }
 
   // ルートパスにアクセスした場合はindex.html(静的)を表示

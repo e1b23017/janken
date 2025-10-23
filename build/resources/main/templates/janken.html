@@ -11,7 +11,9 @@
   <h2>じゃんけん！</h2>
   <p>エントリー</p>
   <ul>
-    <li th:each="user : ${allUsers}" th:text="${user.name}"></li>
+    <li th:each="u : ${allUsers}">
+      <a th:href="@{/match(id=${u.id})}" th:text="${u.name}">ユーザ名</a>
+    </li>
   </ul>
   <div th:if="${username != null}">
     <p>Hi <span th:text="${username}"></span></p>
