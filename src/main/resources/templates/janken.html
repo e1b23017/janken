@@ -11,7 +11,7 @@
   <h2>じゃんけん！</h2>
   <p>エントリー</p>
   <ul>
-    <li th:each="user : ${allUsers}" th:text="${user}"></li>
+    <li th:each="user : ${allUsers}" th:text="${user.name}"></li>
   </ul>
   <div th:if="${username != null}">
     <p>Hi <span th:text="${username}"></span></p>
