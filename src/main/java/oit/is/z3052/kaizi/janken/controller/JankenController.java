@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import oit.is.z3052.kaizi.janken.model.Janken;
+import oit.is.z3052.kaizi.janken.model.MatchMapper;
 import oit.is.z3052.kaizi.janken.model.User;
 import oit.is.z3052.kaizi.janken.model.UserMapper;
+import oit.is.z3052.kaizi.janken.model.Match;
+import oit.is.z3052.kaizi.janken.model.MatchMapper;
 
 @Controller
 public class JankenController {
@@ -19,6 +22,9 @@ public class JankenController {
   // Entry の代わりに DB を参照する UserMapper を注入
   @Autowired
   private UserMapper userMapper;
+
+  @Autowired
+  private MatchMapper matchMapper;
 
   // index.htmlからのGET(ユーザ名受け取り)
   @GetMapping("/janken")
@@ -44,6 +50,11 @@ public class JankenController {
 
     model.addAttribute("username", username);
     model.addAttribute("allUsers", users);
+
+    // DB から全試合を取得してテンプレへ渡す (ArrayListを利用)
+    ArrayList<Match> matches = matchMapper.selectAll();
+    System.out.println("matches.size() = " + matches.size());
+    model.addAttribute("allMatches", matches);
 
     if (userHand != null) {
       Janken janken = new Janken();

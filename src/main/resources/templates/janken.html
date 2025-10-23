@@ -26,6 +26,21 @@
     <p>あいての手: <span th:text="${cpuHand}"></span></p>
     <p>結果: <span th:text="${result}"></span></p>
   </div>
+  <h3>試合結果</h3>
+  <div th:if="${allMatches == null or #lists.isEmpty(allMatches)}">
+    <p>試合はまだありません。</p>
+  </div>
+
+
+  <ul style="list-style:none; padding-left:0;">
+    <li th:each="m : ${allMatches}">
+      <span th:text="${'id:' + m.id
+                       + ' user1:' + (m.user1 != null ? m.user1 : '-')
+                       + ' user2:' + (m.user2 != null ? m.user2 : '-')
+                       + ' user1の手:' + (m.user1Hand != null ? m.user1Hand : '-')
+                       + ' user2の手:' + (m.user2Hand != null ? m.user2Hand : '-') }"></span>
+    </li>
+  </ul>
 </body>
 
 </html>
