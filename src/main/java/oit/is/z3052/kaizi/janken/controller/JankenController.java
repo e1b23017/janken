@@ -184,7 +184,6 @@ public class JankenController {
       return "match";
     }
 
-    // ログインユーザと対戦相手を取得
     User loginUser = userMapper.selectByName(loginName);
     User opponent = userMapper.selectById(opponentId);
 
@@ -197,25 +196,28 @@ public class JankenController {
       return "match";
     }
 
-    // matchinfo テーブルに登録
     try {
-      MatchInfo mi = new MatchInfo();
-      mi.setUser1(loginUser.getId()); // 自身のユーザID
-      mi.setUser2(opponent.getId()); // 相手のユーザID
-      mi.setUser1Hand(userHand); // 自身が選んだ手
-      mi.setIsActive(true); // isActive = true
-
-      matchInfoMapper.insertMatchInfo(mi);
+      // 既に自分が参加する is_active=true の matchinfo があれば挿入しない
+      List<MatchInfo> myActive = matchInfoMapper.selectActiveMatchesByUserId(loginUser.getId());
+      if (myActive == null || myActive.isEmpty()) {
+        // まだ自分のアクティブ試合がない -> 挿入
+        MatchInfo mi = new MatchInfo();
+        mi.setUser1(loginUser.getId());
+        mi.setUser2(opponent.getId());
+        mi.setUser1Hand(userHand);
+        mi.setIsActive(true);
+        matchInfoMapper.insertMatchInfo(mi);
+      } else {
+        // すでに参加中のアクティブ試合がある場合は挿入を行わない（別の挙動が必要ならここを調整）
+      }
     } catch (Exception e) {
-      System.err.println("failed to insert matchinfo: " + e.getMessage());
+      System.err.println("failed to insert matchinfo in /wait: " + e.getMessage());
       model.addAttribute("dbError", "試合情報の保存に失敗しました。");
     }
 
-    // 表示用
+    // 表示に必要な情報を渡す
     model.addAttribute("loginUser", loginUser);
     model.addAttribute("opponent", opponent);
-    // wait.html では loginUser の名前を "Hi ????" と表示するので username も渡す
-    model.addAttribute("username", loginUser.getName());
 
     return "wait";
   }
