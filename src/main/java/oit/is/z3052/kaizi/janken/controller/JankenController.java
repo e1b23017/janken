@@ -1,6 +1,7 @@
 package oit.is.z3052.kaizi.janken.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,13 @@ public class JankenController {
       Model model,
       Principal prin) {
 
-    String username = prin.getName();
+    String username = (prin != null) ? prin.getName() : null;
+
+    if (username == null) {
+      model.addAttribute("username", null);
+      model.addAttribute("allUsers", new ArrayList<User>());
+      return "janken";
+    }
 
     // ログインユーザが users テーブルに存在しなければ追加する (初回のみ)
     User existing = userMapper.selectByName(username);
@@ -45,6 +52,7 @@ public class JankenController {
       User newUser = new User();
       newUser.setName(username);
       userMapper.insertUser(newUser);
+      existing = userMapper.selectByName(username);
     }
 
     // DB から全ユーザを取得してテンプレに渡す
@@ -56,6 +64,19 @@ public class JankenController {
     // DB から全試合を取得してテンプレへ渡す (ArrayListを利用)
     ArrayList<Match> matches = matchMapper.selectAll();
     model.addAttribute("allMatches", matches);
+
+    // ログインユーザに関連する isActive=true の matchinfo を取得してテンプレに渡す
+    try {
+      if (existing != null) {
+        List<MatchInfo> activeMatches = matchInfoMapper.selectActiveMatchesByUserId(existing.getId());
+        model.addAttribute("activeMatchInfos", activeMatches);
+      } else {
+        model.addAttribute("activeMatchInfos", new ArrayList<MatchInfo>());
+      }
+    } catch (Exception e) {
+      System.err.println("failed to load active matchinfo: " + e.getMessage());
+      model.addAttribute("activeMatchInfos", new ArrayList<MatchInfo>());
+    }
 
     if (userHand != null) {
       Janken janken = new Janken();

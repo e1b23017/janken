@@ -18,6 +18,18 @@
   <div th:if="${username != null}">
     <p>Hi <span th:text="${username}"></span></p>
   </div>
+  <h3>アクティブな試合</h3>
+  <div th:if="${activeMatchInfos == null or #lists.isEmpty(activeMatchInfos)}">
+    <p>アクティブな試合はありません。</p>
+  </div>
+  <ul style="list-style:none; padding-left:0;">
+    <li th:each="mi : ${activeMatchInfos}">
+      <span th:text="${'id:' + mi.id
+                         + ' user1:' + (mi.user1 != null ? mi.user1 : '-')
+                         + ' user2:' + (mi.user2 != null ? mi.user2 : '-')
+                         + ' isActive:' + (mi.isActive != null ? mi.isActive : '-') }"></span>
+    </li>
+  </ul>
   </div>
   <h3>試合結果</h3>
   <div th:if="${allMatches == null or #lists.isEmpty(allMatches)}">
