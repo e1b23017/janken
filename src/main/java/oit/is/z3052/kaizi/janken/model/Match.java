@@ -10,6 +10,8 @@ public class Match {
   private String user1Name;
   private String user2Name;
 
+  private Boolean isActive;
+
   public Match() {
   }
 
@@ -67,5 +69,13 @@ public class Match {
 
   public void setUser2Name(String user2Name) {
     this.user2Name = user2Name;
+  }
+
+  public Boolean getIsActive() {
+    return isActive;
+  }
+
+  public void setIsActive(Boolean isActive) {
+    this.isActive = isActive;
   }
 }

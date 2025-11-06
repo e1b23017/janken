@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface MatchMapper {
 
-  @Select("SELECT m.id, m.user1, m.user2, m.user1Hand, m.user2Hand, "
+  @Select("SELECT m.id, m.user1, m.user2, m.user1Hand, m.user2Hand, m.isActive, "
       + "u1.name AS user1Name, u2.name AS user2Name "
       + "FROM matches m "
       + "LEFT JOIN users u1 ON m.user1 = u1.id "
@@ -18,7 +18,7 @@ public interface MatchMapper {
       + "WHERE m.id = #{id}")
   Match selectById(int id);
 
-  @Select("SELECT m.id, m.user1, m.user2, m.user1Hand, m.user2Hand, "
+  @Select("SELECT m.id, m.user1, m.user2, m.user1Hand, m.user2Hand, m.isActive, "
       + "u1.name AS user1Name, u2.name AS user2Name "
       + "FROM matches m "
       + "LEFT JOIN users u1 ON m.user1 = u1.id "
