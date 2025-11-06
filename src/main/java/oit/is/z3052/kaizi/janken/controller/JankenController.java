@@ -14,6 +14,8 @@ import oit.is.z3052.kaizi.janken.model.MatchMapper;
 import oit.is.z3052.kaizi.janken.model.User;
 import oit.is.z3052.kaizi.janken.model.UserMapper;
 import oit.is.z3052.kaizi.janken.model.Match;
+import oit.is.z3052.kaizi.janken.model.MatchInfo;
+import oit.is.z3052.kaizi.janken.model.MatchInfoMapper;
 
 @Controller
 public class JankenController {
@@ -24,6 +26,9 @@ public class JankenController {
 
   @Autowired
   private MatchMapper matchMapper;
+
+  @Autowired
+  private MatchInfoMapper matchInfoMapper;
 
   // index.htmlからのGET(ユーザ名受け取り)
   @GetMapping("/janken")
@@ -145,6 +150,53 @@ public class JankenController {
     model.addAttribute("result", result);
 
     return "match";
+  }
+
+  @GetMapping("/wait")
+  public String showWait(@RequestParam("id") Integer opponentId,
+      @RequestParam("hand") String userHand,
+      Model model,
+      Principal prin) {
+    String loginName = (prin != null) ? prin.getName() : null;
+    if (loginName == null) {
+      model.addAttribute("error", "ログイン情報が見つかりません。");
+      return "match";
+    }
+
+    // ログインユーザと対戦相手を取得
+    User loginUser = userMapper.selectByName(loginName);
+    User opponent = userMapper.selectById(opponentId);
+
+    if (loginUser == null) {
+      model.addAttribute("error", "ログインユーザが見つかりません。");
+      return "match";
+    }
+    if (opponent == null) {
+      model.addAttribute("error", "対戦相手が見つかりません。");
+      return "match";
+    }
+
+    // matchinfo テーブルに登録
+    try {
+      MatchInfo mi = new MatchInfo();
+      mi.setUser1(loginUser.getId()); // 自身のユーザID
+      mi.setUser2(opponent.getId()); // 相手のユーザID
+      mi.setUser1Hand(userHand); // 自身が選んだ手
+      mi.setIsActive(true); // isActive = true
+
+      matchInfoMapper.insertMatchInfo(mi);
+    } catch (Exception e) {
+      System.err.println("failed to insert matchinfo: " + e.getMessage());
+      model.addAttribute("dbError", "試合情報の保存に失敗しました。");
+    }
+
+    // 表示用
+    model.addAttribute("loginUser", loginUser);
+    model.addAttribute("opponent", opponent);
+    // wait.html では loginUser の名前を "Hi ????" と表示するので username も渡す
+    model.addAttribute("username", loginUser.getName());
+
+    return "wait";
   }
 
   // ルートパスにアクセスした場合はindex.html(静的)を表示

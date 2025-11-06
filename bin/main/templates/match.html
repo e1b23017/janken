@@ -35,11 +35,11 @@
     <!-- ここにじゃんけんの手リンクを置く（クリックで /fight に移動） -->
     <p>手を選んでください：</p>
     <p>
-      <a th:href="@{/fight(id=${opponent.id}, hand='Gu')}">グー</a>
+      <a th:href="@{/wait(id=${opponent.id}, hand='Gu')}">グー</a>
       &nbsp;
-      <a th:href="@{/fight(id=${opponent.id}, hand='Choki')}">チョキ</a>
+      <a th:href="@{/wait(id=${opponent.id}, hand='Choki')}">チョキ</a>
       &nbsp;
-      <a th:href="@{/fight(id=${opponent.id}, hand='Pa')}">パー</a>
+      <a th:href="@{/wait(id=${opponent.id}, hand='Pa')}">パー</a>
     </p>
 
     <!-- 判定結果表示（/fight 実行後に model に詰められる） -->
