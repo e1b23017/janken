@@ -12,10 +12,52 @@
 
   <p>相手の手を待ってます</p>
 
-  <!-- ログインしたユーザ名表示（"Hi ????") -->
-  <p>Hi <span th:text="${loginUser.name}">ユーザ名</span></p>
+  <!-- 非同期結果表示用 -->
+  <div id="kekkaArea" style="display:none;">
+    <p id="kekkaText"></p>
+    <p><a id="backLink" href="/janken">戻る</a></p>
+  </div>
 
-  <p><a th:href="@{/janken}">もどる</a></p>
+  <!-- Polling script (calls /async-kekka which uses Principal to identify user) -->
+  <script>
+    const POLL_INTERVAL = 1000;
+    let polling = true;
+
+    async function poll() {
+      try {
+        const resp = await fetch('/async-kekka', { credentials: 'same-origin' });
+        if (!resp.ok) {
+          console.error('async-kekka error:', resp.status);
+          return;
+        }
+        const data = await resp.json();
+        if (data.found) {
+          const userHand = data.userHand || '-';
+          const opponentHand = data.opponentHand || '-';
+          const result = data.result || '-';
+          const text = `あなたの手: ${userHand}　相手の手: ${opponentHand}　結果: ${result}`;
+          document.getElementById('kekkaText').textContent = text;
+          document.getElementById('kekkaArea').style.display = 'block';
+          polling = false;
+        }
+      } catch (e) {
+        console.error('poll error', e);
+      }
+    }
+
+    (function startPolling() {
+      poll();
+      const timer = setInterval(() => {
+        if (!polling) {
+          clearInterval(timer);
+          return;
+        }
+        poll();
+      }, POLL_INTERVAL);
+    })();
+  </script>
+
+  <p><a href="/janken">もどる</a></p>
 </body>
 
 </html>

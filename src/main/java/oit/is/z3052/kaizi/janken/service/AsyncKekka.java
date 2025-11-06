@@ -17,6 +17,10 @@ import oit.is.z3052.kaizi.janken.model.MatchInfo;
 import oit.is.z3052.kaizi.janken.model.User;
 import oit.is.z3052.kaizi.janken.model.Janken;
 
+/**
+ * 非同期ポーリング用エンドポイント（wait.html がポーリングする）。
+ * AsyncProcessor を使わず、検出時に同期的に DB を更新してクリーンアップします。
+ */
 @RestController
 public class AsyncKekka {
 
@@ -29,8 +33,6 @@ public class AsyncKekka {
   @Autowired
   MatchInfoMapper matchInfoMapper;
 
-  // 非同期ポーリング用エンドポイント
-  // Principal からユーザを判定し、matches テーブルに is_active = true の試合があれば結果を返す
   @GetMapping("/async-kekka")
   public Map<String, Object> checkKekka(Principal prin) {
     Map<String, Object> res = new HashMap<>();
@@ -76,16 +78,22 @@ public class AsyncKekka {
       res.put("opponentHand", opponentHand);
       res.put("result", result);
 
-      // 試合を検出したら matches の is_active を false にして、対応する matchinfo も false にする
-      // matches を非アクティブにする
-      activeMatch.setIsActive(false);
-      matchMapper.updateIsActiveById(activeMatch);
+      // --- 同期的に DB をクリーンアップ ---
+      try {
+        activeMatch.setIsActive(false);
+        matchMapper.updateIsActiveById(activeMatch);
+      } catch (Exception ex) {
+        System.err.println("failed to update matches.is_active: " + ex.getMessage());
+      }
 
-      // さらに、対応する matchinfo を探して is_active=false にする
-      MatchInfo mi = matchInfoMapper.selectActiveBetweenUsers(activeMatch.getUser1(), activeMatch.getUser2());
-      if (mi != null) {
-        mi.setIsActive(false);
-        matchInfoMapper.updateIsActiveById(mi);
+      try {
+        MatchInfo mi = matchInfoMapper.selectActiveBetweenUsers(activeMatch.getUser1(), activeMatch.getUser2());
+        if (mi != null) {
+          mi.setIsActive(false);
+          matchInfoMapper.updateIsActiveById(mi);
+        }
+      } catch (Exception ex) {
+        System.err.println("failed to update matchinfo.is_active: " + ex.getMessage());
       }
 
       return res;
